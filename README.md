@@ -1,5 +1,5 @@
 # Angry-Blocks
-A game where Angry Blocks fall from the sky. 
+A game where Angry Blocks fall from the sky, made with LibGdx.
   <br>The Player...</br>
 * Is an innocent triangle
 * Has 3 lives
