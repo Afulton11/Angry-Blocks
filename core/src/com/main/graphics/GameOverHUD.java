@@ -23,7 +23,7 @@ public class GameOverHUD extends RectHUD {
 		titleGlyph = new GlyphLayout();
 		titleGlyph.setText(font, text);
 		scoreGlyph = new GlyphLayout();
-		scoreGlyph.setText(btnFont, "Score: ");
+		scoreGlyph.setText(font, "Score: ");
 		hud = new HUDHandler();
 		initButtons(mainMenuSequenceListener, retrySequenceListener);
 	}
@@ -56,7 +56,7 @@ public class GameOverHUD extends RectHUD {
 		//draw the 'ame Over!' text.
 		font.draw(batch, titleGlyph, Constants.GAME_WIDTH / 2 - titleGlyph.width / 2, Constants.GAME_HEIGHT - titleGlyph.height / 2 - Constants.GAME_HEIGHT / 8);
 		//draw the 'Score: ####' text
-		btnFont.draw(batch, scoreGlyph, Constants.GAME_WIDTH / 2 - scoreGlyph.width / 2, Constants.GAME_HEIGHT / 2 - scoreGlyph.height / 2);
+		font.draw(batch, scoreGlyph, Constants.GAME_WIDTH / 2 - scoreGlyph.width / 2, Constants.GAME_HEIGHT / 2 + scoreGlyph.height / 2);
 		//buttons
 		hud.render(batch);
 	}
@@ -66,7 +66,7 @@ public class GameOverHUD extends RectHUD {
 	}
 	
 	public void updateScore(int score) {
-		scoreGlyph.setText(btnFont, "Score " + score);
+		scoreGlyph.setText(font, "Score: " + score);
 	}
 	
 	public void dispose() {

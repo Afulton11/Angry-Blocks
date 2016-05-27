@@ -7,11 +7,12 @@ import com.badlogic.gdx.utils.Array;
 import com.main.Constants;
 import com.main.utils.Utils;
 
-public class PlayerTexturedEntity extends FallingTexturedEntity {
+public class PlayerTexturedEntity extends TexturedEntity {
 	
 	private final int MAX_LIVES = 3;
 	private int lives, score;
-	private float scoreCounter;
+	private float speed, scoreCounter;
+	private float maxHeight;
 	
 	public OnDeathListener deathListener;
 	
@@ -23,13 +24,14 @@ public class PlayerTexturedEntity extends FallingTexturedEntity {
 		lives = MAX_LIVES;
 		damaged_textures.add(texture);
 		score = 0;
+		maxHeight = 0;
 	}
 	
 	@Override
 	public void update(float delta) {
 		if(alive()) {
 			checkInputs(delta);
-			scoreCounter += delta;
+			scoreCounter += delta * 10;
 			while(scoreCounter > 1) {
 				score++;
 				scoreCounter--;
@@ -45,6 +47,13 @@ public class PlayerTexturedEntity extends FallingTexturedEntity {
 		} else if(Gdx.input.isKeyPressed(Keys.LEFT)) {
 			if(Utils.isFloatXInScreen(this.x - speed * delta, Constants.DEFAULT_VIEWPORT)) {
 				this.x -= speed * delta;
+			}
+		}
+		if(Gdx.input.isKeyPressed(Keys.UP)) {
+			if(!Utils.equalFloats(y, maxHeight, speed * delta))
+				this.y += speed * delta;
+			else {
+				this.y = maxHeight;
 			}
 		}
 	}
@@ -71,4 +80,25 @@ public class PlayerTexturedEntity extends FallingTexturedEntity {
 	public int getScore() {
 		return score;
 	}
+	
+	public float getSpeed(){
+		return speed;
+	}
+	
+	public void setSpeed(float speed) {
+		this.speed = speed;
+	}
+	
+	public void setMaxHeight(float height) {
+		this.maxHeight = height;
+	}
+	
+	public final int getMAX_LIVES(){
+		return MAX_LIVES;
+	}
+	
+	public final int getLives() {
+		return lives;
+	}
+	
 }

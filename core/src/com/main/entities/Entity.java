@@ -1,5 +1,6 @@
 package com.main.entities;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.main.Constants;
 import com.main.utils.Utils;
@@ -17,7 +18,10 @@ public abstract class Entity implements Poolable{
 		this.y = y;
 	}
 	
+	public abstract void render(SpriteBatch batch);
 	public abstract void update(float delta);
+	
+	public void dispose() {}
 	
 	@Override
 	public void reset() {

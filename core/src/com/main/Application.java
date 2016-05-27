@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
+import com.badlogic.gdx.utils.Array;
 import com.main.screens.GameScreen;
 import com.main.screens.LoadingScreen;
 import com.main.screens.MainMenuScreen;
@@ -24,6 +25,8 @@ public class Application extends Game {
 	private FreeTypeFontGenerator fontGen;
 	private FreeTypeFontParameter fontParams;
 	
+	private Array<BitmapFont> fonts;
+	
 	private LoadingScreen loadingScreen;
 	private MainMenuScreen mainMenuScreen;
 	private GameScreen gameScreen;
@@ -31,6 +34,7 @@ public class Application extends Game {
 	@Override
 	public void create () {
 		Gdx.app.setLogLevel(com.badlogic.gdx.Application.LOG_DEBUG);
+		fonts = new Array<BitmapFont>();
 		batch = new SpriteBatch();
 		assets = new AssetManager();
 		loadingScreen = new LoadingScreen(this);
@@ -46,6 +50,9 @@ public class Application extends Game {
 	
 	public void dispose() {
 		super.dispose();
+		for(BitmapFont font : fonts) {
+			font.dispose();
+		}
 		batch.dispose();
 		assets.clear();
 		assets.dispose();
@@ -58,6 +65,7 @@ public class Application extends Game {
 		fontParams.color = color;
 		BitmapFont font = fontGen.generateFont(fontParams);
 		fontGen.dispose();
+		fonts.add(font);
 		return font;
 	}
 	

@@ -26,6 +26,7 @@ public class MainMenuScreen implements Screen {
 	private final String TAG = "MainMenu";
 	
 	private final Application app;
+	private final float BTN_WIDTH = GAME_WIDTH / 3f, BTN_HEIGHT = GAME_HEIGHT / 6f;
 	
 	private OrthographicCamera cam;
 	
@@ -39,13 +40,15 @@ public class MainMenuScreen implements Screen {
 		this.app = app;
 		this.cam = new OrthographicCamera();
 		hudHandler = new HUDHandler();
+		titleFont = app.getFont("fonts/RobotoRegular.ttf", 124, Color.GOLD);
+		titleGlyph = new GlyphLayout(titleFont, TITLE);
+		int btnFontSize = Utils.getFontSize((int)BTN_WIDTH, (int)BTN_HEIGHT, ROBOTO_REGULAR_SIZE_MULTIPLIER);
+		btnFont = app.getFont("fonts/Segoe.ttf", btnFontSize, Color.BLACK);
 	}
 	
 	@Override
 	public void show() {
 		cam.setToOrtho(false, GAME_WIDTH, GAME_HEIGHT);
-		titleFont = app.getFont("fonts/Segoe.ttf", 124, Color.GOLD);
-		titleGlyph = new GlyphLayout(titleFont, TITLE);
 		if(background == null) {
 			background = app.assets.get("imgs/background.png", Texture.class);
 		}
@@ -58,6 +61,8 @@ public class MainMenuScreen implements Screen {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 				
+		app.batch.setProjectionMatrix(cam.combined);
+		
 		app.batch.begin();
 		hudHandler.render(app.batch);
 		titleFont.draw(app.batch, titleGlyph, GAME_WIDTH / 2f - titleGlyph.width / 2f, GAME_HEIGHT - GAME_HEIGHT / 8f + titleGlyph.height / 2);
@@ -85,8 +90,6 @@ public class MainMenuScreen implements Screen {
 	@Override
 	public void dispose() {
 		hudHandler.dispose();
-		titleFont.dispose();
-		btnFont.dispose();
 	}
 	
 	private void loadUI() {
@@ -96,17 +99,15 @@ public class MainMenuScreen implements Screen {
 	}
 	
 	private void loadButtons() {
-		final float playBtnWidth = GAME_WIDTH / 3f, playBtnHeight = GAME_HEIGHT / 6f;  
-		int btnFontSize = Utils.getFontSize((int)playBtnWidth, (int)playBtnHeight, ROBOTO_REGULAR_SIZE_MULTIPLIER);
-		btnFont = app.getFont("fonts/RobotoRegular.ttf", btnFontSize, Color.BLACK);
-		final Button playButton = new Button(GAME_WIDTH / 2f - playBtnWidth / 2, GAME_HEIGHT - playBtnHeight - GAME_HEIGHT / 4f, 
-				playBtnWidth, playBtnHeight, Color.WHITE, btnFont , "Play");
+
+		final Button playButton = new Button(GAME_WIDTH / 2f - BTN_WIDTH / 2, GAME_HEIGHT - BTN_HEIGHT - GAME_HEIGHT / 4f, 
+				BTN_WIDTH, BTN_HEIGHT, Color.WHITE, btnFont , "Play");
 		playButton.setClickListener(new ButtonClickListener() {
 			@Override
 			public void onClick() {}
 			@Override
 			public void onRelease() {
-				playButton.setFade(1.0f, 0.1f);
+				playButton.setFade(1.0f, 0.5f);
 			}
 		});
 		playButton.setSequenceListener(new SequenceListener() {	
@@ -124,14 +125,14 @@ public class MainMenuScreen implements Screen {
 		});
 		
 		
-		final Button settingsButton = new Button(GAME_WIDTH / 2f - playBtnWidth / 2, GAME_HEIGHT - playBtnHeight * 2 - GAME_HEIGHT / 4f - playBtnHeight / 2, 
-				playBtnWidth, playBtnHeight, Color.WHITE, btnFont, "Settings");
+		final Button settingsButton = new Button(GAME_WIDTH / 2f - BTN_WIDTH / 2, GAME_HEIGHT - BTN_HEIGHT * 2 - GAME_HEIGHT / 4f - BTN_HEIGHT / 2, 
+				BTN_WIDTH, BTN_HEIGHT, Color.WHITE, btnFont, "Settings");
 		settingsButton.setClickListener(new ButtonClickListener() {
 			@Override
 			public void onClick() {}
 			@Override
 			public void onRelease() {
-				settingsButton.setFade(1.0f, 0.1f);
+				settingsButton.setFade(1.0f, 0.5f);
 			}
 		});
 		settingsButton.setSequenceListener(new SequenceListener() {	
@@ -148,14 +149,14 @@ public class MainMenuScreen implements Screen {
 			}
 		});
 		
-		final Button quitButton = new Button(GAME_WIDTH / 2f - playBtnWidth / 2, settingsButton.getY() - settingsButton.getHeight() - playBtnHeight / 2, 
-				playBtnWidth, playBtnHeight, Color.WHITE, btnFont, "Quit Game");
+		final Button quitButton = new Button(GAME_WIDTH / 2f - BTN_WIDTH / 2, settingsButton.getY() - settingsButton.getHeight() - BTN_HEIGHT / 2, 
+				BTN_WIDTH, BTN_HEIGHT, Color.WHITE, btnFont, "Quit Game");
 		quitButton.setClickListener(new ButtonClickListener() {
 			@Override
 			public void onClick() {}
 			@Override
 			public void onRelease() {
-				quitButton.setFade(1.0f, 0.1f);
+				quitButton.setFade(1.0f, 0.5f);
 			}
 		});
 		quitButton.setSequenceListener(new SequenceListener() {	

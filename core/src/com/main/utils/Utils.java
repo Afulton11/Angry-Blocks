@@ -46,4 +46,12 @@ public final class Utils {
 		float yDist = y1 - y2;
 		return (float) Math.sqrt((xDist * xDist) + (yDist * yDist));
 	}
+	
+	public static final boolean equalFloats(float f1, float f2) {
+		return Math.abs(f1 - f2) < 0.01f;
+	}
+	
+	public static final boolean equalFloats(float f1, float f2, float maxDist) {
+		return Math.abs(f1 - f2) < maxDist;
+	}
 }

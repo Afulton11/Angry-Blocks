@@ -8,13 +8,17 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.main.Application;
 import com.main.Constants;
+import com.main.entities.EntityHandler;
 import com.main.entities.FallingEntitySpawner;
 import com.main.entities.OnDeathListener;
 import com.main.entities.PlayerTexturedEntity;
 import com.main.graphics.GameOverHUD;
 import com.main.graphics.SequenceListener;
+import com.main.graphics.TextHUD;
 import com.main.utils.Utils;
 
 public class GameScreen implements Screen {
@@ -24,33 +28,44 @@ public class GameScreen implements Screen {
 	private final Application app;
 	
 	private OrthographicCamera cam;
+	private SpriteBatch hudBatch;
 	
-	private FallingEntitySpawner spawner;
+	private EntityHandler entityHandler;
 	private PlayerTexturedEntity player;
 	
+	private TextHUD scoreHud;
 	private GameOverHUD gameOver;
-	private BitmapFont gameOverTitleFont, gameOverBtnFont;
+	private BitmapFont segoeWhite, gameOverTitleFont, gameOverBtnFont;
 	private Texture background;
 	
 	public GameScreen(final Application app) {
 		this.app = app;
 		cam = new OrthographicCamera();
+		entityHandler = new EntityHandler();
+		gameOverTitleFont = app.getFont("fonts/curlyText.ttf", 128, Color.WHITE);
+		gameOverBtnFont = app.getFont("fonts/Segoe.ttf", Utils.getFontSize((int)GameOverHUD.BUTTON_WIDTH, (int)GameOverHUD.BUTTON_HEIGHT, 
+				Constants.ROBOTO_REGULAR_SIZE_MULTIPLIER), Color.BLACK);
+		segoeWhite = app.getFont("fonts/Segoe.ttf", 32, Color.WHITE);
 	}
 	
 	@Override
 	public void show() {
+		hudBatch = new SpriteBatch();
 		cam.setToOrtho(false, Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
-		spawner = new FallingEntitySpawner(app.assets.get("imgs/fallingEntity_1.png", Texture.class));
 		player = new PlayerTexturedEntity(app.assets.get("imgs/player.png", Texture.class), Constants.GAME_WIDTH / 2f - 32, 128, 64, 64);
-		player.setSpeed(200.0f);
+		player.setSpeed(300.0f);
+		FallingEntitySpawner spawner = new FallingEntitySpawner(app.assets.get("imgs/fallingEntity_1.png", Texture.class), player);
 		
-		gameOverTitleFont = app.getFont("fonts/curlyText.ttf", 128, Color.WHITE);
-		gameOverBtnFont = app.getFont("fonts/Segoe.ttf", Utils.getFontSize((int)GameOverHUD.BUTTON_WIDTH, (int)GameOverHUD.BUTTON_HEIGHT, 
-				Constants.ROBOTO_REGULAR_SIZE_MULTIPLIER), Color.BLACK);
+		entityHandler.addEntities(player, spawner);
+		
 		if(background == null) {
-			background = app.assets.get("imgs/game_background.png", Texture.class);
+			background = app.assets.get("imgs/background.png", Texture.class);
 		}
 		setUpGameOverHUD();
+		
+		
+		final GlyphLayout scoreGlyph = new GlyphLayout(segoeWhite, "" + player.getScore());
+		scoreHud = new TextHUD(Constants.GAME_WIDTH / 2 - scoreGlyph.width, Constants.GAME_HEIGHT - scoreGlyph.height, segoeWhite, scoreGlyph);
 	}
 
 	@Override
@@ -58,26 +73,33 @@ public class GameScreen implements Screen {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-		app.batch.setProjectionMatrix(cam.combined);
+		hudBatch.begin();
+		hudBatch.draw(background, 0, 0, Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
+		hudBatch.end();
 		
+		app.batch.setProjectionMatrix(cam.combined);
 		app.batch.begin();
-		app.batch.draw(background, 0, 0, Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
-		player.render(app.batch);
-		spawner.render(app.batch);
+		entityHandler.render(app.batch);
+		app.batch.end();
+		
+		hudBatch.begin();
 		if(!player.alive()) {
 			//render dead overlay Hud.
-			gameOver.render(app.batch);
+			gameOver.render(hudBatch);
+		} else {
+			scoreHud.render(hudBatch);
 		}
-		app.batch.end();
+		hudBatch.end();
 
 		update(delta);
 	}
 	
 	private void update(float delta) {
 		if(player.alive()) {
-			player.update(delta);
-			spawner.update(delta);
-			spawner.checkCollisionsWithPlayer(player);
+			entityHandler.update(delta);
+			scoreHud.updateText("" + player.getScore());
+			cam.update();
+			cam.position.y = player.getY() + Constants.GAME_HEIGHT / 2f - player.getHeight();
 		} else {
 			gameOver.update(delta);
 		}
@@ -100,10 +122,9 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		spawner.dispose();
+		hudBatch.dispose();
+		entityHandler.dispose();
 		gameOver.dispose();
-		gameOverTitleFont.dispose();
-		gameOverBtnFont.dispose();
 	}
 	
 	private void setUpGameOverHUD(){
@@ -130,7 +151,6 @@ public class GameScreen implements Screen {
 							@Override
 							public void onFadeFinished() {}
 						});
-		
 		player.deathListener = new OnDeathListener() {
 			@Override
 			public void onDeath() {

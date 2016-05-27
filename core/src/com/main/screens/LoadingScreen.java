@@ -34,14 +34,14 @@ public class LoadingScreen implements Screen {
 		this.app = app;
 		this.cam = new OrthographicCamera();
 		cam.setToOrtho(false, Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
+		font = app.getFont("fonts/RobotoLight.ttf", 16, Color.WHITE);
+		loading_layout = new GlyphLayout(font, "Loading...");
 	}
 	
 	@Override
 	public void show() {	
 		cam.setToOrtho(false, Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
 		shapeRenderer = new ShapeRenderer();
-		font = app.getFont("fonts/RobotoLight.ttf", 16, Color.WHITE);
-		loading_layout = new GlyphLayout(font, "Loading...");
 		progress = 0;
 		loadAssets();
 	}
@@ -115,7 +115,6 @@ public class LoadingScreen implements Screen {
 	@Override
 	public void dispose() {		
 		shapeRenderer.dispose();
-		font.dispose();
 	}
 
 }
